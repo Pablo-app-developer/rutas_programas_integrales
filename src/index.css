@@ -4,7 +4,7 @@
 
 body {
   margin: 0;
-  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
   background: #EEF1F5;
   color: #1F2D3D;
   -webkit-font-smoothing: antialiased;
