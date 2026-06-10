@@ -70,13 +70,16 @@ export default function App() {
     <div style={{ background: COLORS.bg, minHeight: '100vh' }}>
       {/* ── Header ── */}
       <header className="flex items-center justify-between px-6 py-3 gap-4 flex-wrap" style={{ background: COLORS.navy }}>
-        <div>
-          <h1 className="text-white font-bold uppercase leading-tight" style={{ fontSize: 22, letterSpacing: '0.01em' }}>
-            Estructura del Costo por Programa y Uso de Recursos Médicos
-          </h1>
-          <p className="text-slate-300" style={{ fontSize: 12 }}>
-            Análisis por ruta clínica – Cifras promedio por paciente
-          </p>
+        <div className="flex items-center gap-4">
+          <img src="./logo-ino.png" alt="Logo INO" style={{ height: 52, width: 'auto', objectFit: 'contain', flexShrink: 0 }} />
+          <div>
+            <h1 className="text-white font-bold uppercase leading-tight" style={{ fontSize: 22, letterSpacing: '0.01em' }}>
+              Estructura del Costo por Programa y Uso de Recursos Médicos
+            </h1>
+            <p className="text-slate-300" style={{ fontSize: 12 }}>
+              Análisis por ruta UN: Programas integrales 2026
+            </p>
+          </div>
         </div>
 
         <div className="flex items-center gap-4 flex-wrap">
