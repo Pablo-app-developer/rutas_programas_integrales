@@ -4,5 +4,6 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: '/rutas_programas_integrales/',
+  // Rutas relativas: funciona tanto en la raíz (Vercel) como en subdirectorio
+  base: './',
 })
