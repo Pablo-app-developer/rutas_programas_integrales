@@ -71,7 +71,7 @@ export default function App() {
       {/* ── Header ── */}
       <header className="flex items-center justify-between px-6 py-3 gap-4 flex-wrap" style={{ background: COLORS.navy }}>
         <div className="flex items-center gap-4">
-          <img src="./logo-ino.png" alt="Logo INO" style={{ height: 52, width: 'auto', objectFit: 'contain', flexShrink: 0 }} />
+          <img src="./logo-ino.png" alt="Logo INO" style={{ height: 52, width: 'auto', objectFit: 'contain', flexShrink: 0, filter: 'brightness(0) invert(1)' }} />
           <div>
             <h1 className="text-white font-bold uppercase leading-tight" style={{ fontSize: 22, letterSpacing: '0.01em' }}>
               Estructura del Costo por Programa y Uso de Recursos Médicos
