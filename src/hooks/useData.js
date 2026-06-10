@@ -10,5 +10,8 @@ export function useData() {
       .catch(err => setState(s => ({ ...s, loading: false, error: err.message })))
   }, [])
 
-  return state
+  const reemplazarDatos = ({ data12, data18 }) =>
+    setState({ data12, data18, loading: false, error: null })
+
+  return { ...state, reemplazarDatos }
 }

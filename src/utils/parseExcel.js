@@ -31,13 +31,17 @@ function parsePct(value) {
   return isNaN(num) ? 0 : num / 100
 }
 
-export async function loadDashboardData() {
-  const res = await fetch('./datos.xlsx')
-  const ab = await res.arrayBuffer()
+export function parseFromArrayBuffer(ab) {
   const wb = XLSX.read(ab, { type: 'array' })
   const data12 = parseSheet(wb, 'BASE12MESES', 12)
   const data18 = parseSheet(wb, 'BASE18MESES', 18)
   return { data12, data18 }
+}
+
+export async function loadDashboardData() {
+  const res = await fetch('./datos.xlsx')
+  const ab = await res.arrayBuffer()
+  return parseFromArrayBuffer(ab)
 }
 
 function parseSheet(wb, sheetName, duracion) {

@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useData } from './hooks/useData.js'
+import { parseFromArrayBuffer } from './utils/parseExcel.js'
 import { RUTAS, TODAS, COLORS } from './theme.js'
 import Sec1Resumen from './components/sections/Sec1Resumen.jsx'
 import Sec2Fishbone from './components/sections/Sec2Fishbone.jsx'
@@ -15,9 +16,28 @@ const BASES = {
 }
 
 export default function App() {
-  const { data12, data18, loading, error } = useData()
+  const { data12, data18, loading, error, reemplazarDatos } = useData()
   const [selectedRuta, setSelectedRuta] = useState('ASMA')
   const [baseActiva, setBaseActiva] = useState('12')
+  const [uploadStatus, setUploadStatus] = useState(null) // null | 'loading' | 'ok' | 'error'
+  const fileInputRef = useRef(null)
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    setUploadStatus('loading')
+    try {
+      const ab = await file.arrayBuffer()
+      const parsed = parseFromArrayBuffer(ab)
+      reemplazarDatos(parsed)
+      setUploadStatus('ok')
+      setTimeout(() => setUploadStatus(null), 2500)
+    } catch {
+      setUploadStatus('error')
+      setTimeout(() => setUploadStatus(null), 3000)
+    }
+    e.target.value = ''
+  }
 
   if (loading) {
     return (
@@ -78,6 +98,34 @@ export default function App() {
                 )
               })}
             </div>
+          </div>
+
+          {/* Botón actualizar datos Excel */}
+          <div className="flex items-center gap-2">
+            <input ref={fileInputRef} type="file" accept=".xlsx" className="hidden" onChange={handleFileUpload} />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadStatus === 'loading'}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded font-semibold transition-all"
+              style={{
+                background: uploadStatus === 'ok' ? '#1E8449'
+                           : uploadStatus === 'error' ? '#C0392B'
+                           : 'rgba(255,255,255,0.15)',
+                color: '#fff', fontSize: 11,
+                border: '1px solid rgba(255,255,255,0.3)',
+                cursor: uploadStatus === 'loading' ? 'wait' : 'pointer',
+              }}
+              title="Cargar un nuevo archivo datos.xlsx para actualizar el dashboard"
+            >
+              {uploadStatus === 'loading' && <span style={{ fontSize: 12, animation: 'spin 1s linear infinite', display: 'inline-block' }}>⟳</span>}
+              {uploadStatus === 'ok' && <span style={{ fontSize: 12 }}>✓</span>}
+              {uploadStatus === 'error' && <span style={{ fontSize: 12 }}>✗</span>}
+              {!uploadStatus && <span style={{ fontSize: 12 }}>↑</span>}
+              {uploadStatus === 'loading' ? 'Cargando…'
+               : uploadStatus === 'ok' ? 'Datos actualizados'
+               : uploadStatus === 'error' ? 'Error al leer'
+               : 'Actualizar Excel'}
+            </button>
           </div>
         </div>
       </header>
