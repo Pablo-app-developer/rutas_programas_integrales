@@ -1,11 +1,10 @@
-import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, Cell, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts'
 import SectionHeader from '../ui/SectionHeader.jsx'
 import { totalesPorRuta, formatCOP, formatCOPfull } from '../../utils/parseExcel.js'
-import { rutaMeta, COLORS } from '../../theme.js'
+import { rutaMeta, COLORS, TODAS } from '../../theme.js'
 import { RutaIcon } from '../../icons.jsx'
 
-const COLOR12 = COLORS.navyLight
-const COLOR18 = '#1E8449'
+const COLOR18_BG = 'rgba(0,0,0,0.28)'
 
 const RutaTick = ({ x, y, payload }) => {
   const m = rutaMeta(payload.value)
@@ -21,8 +20,9 @@ const RutaTick = ({ x, y, payload }) => {
   )
 }
 
-const BulletShape = ({ x, y, width, height, payload }) => {
+const BulletShape = ({ x, y, width, height, payload, opacity = 1 }) => {
   if (!payload || payload.maxTotal === 0) return null
+  const color = rutaMeta(payload.ruta).color
   const h18 = height * (payload.total18 / payload.maxTotal)
   const h12 = height * (payload.total12 / payload.maxTotal)
   const y18 = y + height - h18
@@ -32,13 +32,13 @@ const BulletShape = ({ x, y, width, height, payload }) => {
   const cx = x + width / 2
 
   return (
-    <g>
-      <rect x={x} y={y18} width={width} height={h18} fill={COLOR18} opacity={0.28} />
-      <rect x={xThin} y={y12} width={thinW} height={h12} fill={COLOR12} />
-      <text x={cx} y={y18 - 11} textAnchor="middle" fontSize={8} fill={COLOR18} fontWeight="700">
+    <g opacity={opacity}>
+      <rect x={x} y={y18} width={width} height={h18} fill={color} opacity={0.28} />
+      <rect x={xThin} y={y12} width={thinW} height={h12} fill={color} />
+      <text x={cx} y={y18 - 11} textAnchor="middle" fontSize={8} fill={color} fontWeight="700">
         {formatCOP(payload.total18)}
       </text>
-      <text x={cx} y={y12 - 3} textAnchor="middle" fontSize={8} fill={COLOR12} fontWeight="700">
+      <text x={cx} y={y12 - 3} textAnchor="middle" fontSize={8} fill={color} fontWeight="700">
         {formatCOP(payload.total12)}
       </text>
     </g>
@@ -48,11 +48,12 @@ const BulletShape = ({ x, y, width, height, payload }) => {
 const ChartTooltip = ({ active, payload }) => {
   if (!active || !payload?.length) return null
   const d = payload[0].payload
+  const color = rutaMeta(d.ruta).color
   return (
     <div className="rounded shadow-lg" style={{ background: '#fff', border: `1px solid ${COLORS.border}`, padding: '8px 10px', fontSize: 11 }}>
-      <div className="font-bold mb-1" style={{ color: rutaMeta(d.ruta).color }}>{d.ruta}</div>
-      <div style={{ color: COLOR12 }}>12 meses: <strong>{formatCOPfull(d.total12)}</strong></div>
-      <div style={{ color: COLOR18 }}>18 meses: <strong>{formatCOPfull(d.total18)}</strong></div>
+      <div className="font-bold mb-1" style={{ color }}>{d.ruta}</div>
+      <div style={{ color: COLORS.textDark }}>12 meses: <strong>{formatCOPfull(d.total12)}</strong></div>
+      <div style={{ color: COLORS.textDark }}>18 meses: <strong>{formatCOPfull(d.total18)}</strong></div>
     </div>
   )
 }
@@ -68,17 +69,19 @@ export default function Sec1Resumen({ data12, data18, selectedRuta, onSelectRuta
     return { ruta, total12, total18, maxTotal: Math.max(total12, total18) }
   }).sort((a, b) => b.maxTotal - a.maxTotal)
 
+  const isAllSelected = !selectedRuta || selectedRuta === TODAS
+
   return (
     <div className="panel flex flex-col h-full">
       <SectionHeader num="1" title="Resumen Ejecutivo – Costo Total por Programa" />
       <div className="p-3 flex-1 flex flex-col">
         <div className="flex items-center justify-center gap-5 mb-1">
           <div className="flex items-center gap-1.5">
-            <div style={{ width: 10, height: 14, background: COLOR12 }} />
+            <div style={{ width: 10, height: 14, background: COLORS.textMute }} />
             <span style={{ fontSize: 9, color: COLORS.textMute }}>Ruta Normal (12 meses)</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div style={{ width: 14, height: 14, background: COLOR18, opacity: 0.35 }} />
+            <div style={{ width: 14, height: 14, background: COLORS.textMute, opacity: 0.3 }} />
             <span style={{ fontSize: 9, color: COLORS.textMute }}>Ruta Ecopetrol (18 meses)</span>
           </div>
         </div>
@@ -94,7 +97,11 @@ export default function Sec1Resumen({ data12, data18, selectedRuta, onSelectRuta
               />
               <XAxis dataKey="ruta" tick={<RutaTick />} axisLine={{ stroke: COLORS.border }} tickLine={false} interval={0} height={36} />
               <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(31,61,92,0.05)' }} />
-              <Bar dataKey="maxTotal" shape={<BulletShape />} onClick={d => onSelectRuta(d.ruta)} cursor="pointer" isAnimationActive={false} />
+              <Bar dataKey="maxTotal" shape={<BulletShape />} onClick={d => onSelectRuta(d.ruta)} cursor="pointer" isAnimationActive={false}>
+                {data.map(d => (
+                  <Cell key={d.ruta} opacity={isAllSelected || selectedRuta === d.ruta ? 1 : 0.25} />
+                ))}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
