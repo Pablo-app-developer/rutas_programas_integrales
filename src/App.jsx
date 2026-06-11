@@ -270,7 +270,7 @@ export default function App() {
       <main className="p-4" style={{ display: 'grid', gridTemplateColumns: '4fr 5fr 3fr', gap: 16, alignItems: 'stretch' }}>
         {/* Columna izquierda: barras + tabla detallada */}
         <div className="flex flex-col gap-4">
-          <Sec1Resumen records={records} selectedRuta={selectedRuta} onSelectRuta={setSelectedRuta} baseLabel={baseLabel} />
+          <Sec1Resumen data12={data12} data18={data18} selectedRuta={selectedRuta} onSelectRuta={setSelectedRuta} />
           <Sec4Tabla records={records} selectedRuta={selectedRuta} />
         </div>
         {/* Columna central (más ancha): fishbone + mapa estratégico (necesitan espacio) */}
