@@ -49,8 +49,8 @@ export default function Sec6Mapa({ records, selectedRuta, onSelectRuta }) {
                            width: sz, height: sz, cursor: 'pointer', zIndex: sel ? 7 : 2 }}
                   title={`${p.ruta} · ${formatCOP(p.costo)} · ${p.usos} servicios por paciente`}>
                   <div className="flex items-center justify-center rounded-full w-full h-full"
-                       style={{ background: tier.color,
-                                boxShadow: sel ? `0 0 0 3px ${tier.color}44, 0 2px 6px rgba(0,0,0,.25)` : '0 1px 3px rgba(0,0,0,0.25)',
+                       style={{ background: m.color,
+                                boxShadow: sel ? `0 0 0 3px ${m.color}44, 0 2px 6px rgba(0,0,0,.25)` : '0 1px 3px rgba(0,0,0,0.25)',
                                 transition: 'all .15s' }}>
                     <RutaIcon ruta={p.ruta} size={sz * 0.56} color="#fff" strokeWidth={2.2} />
                   </div>
@@ -59,7 +59,7 @@ export default function Sec6Mapa({ records, selectedRuta, onSelectRuta }) {
                                  [labelLeft ? 'right' : 'left']: '118%',
                                  whiteSpace: 'nowrap', fontSize: 8, color: COLORS.textDark,
                                  background: 'rgba(255,255,255,0.88)', boxShadow: '0 0 2px rgba(255,255,255,0.95)' }}>
-                    {m.short.replace('\n', ' ')} <span style={{ color: tier.color }}>{formatCOP(p.costo)}</span>
+                    {m.short.replace('\n', ' ')} <span style={{ color: m.color }}>{formatCOP(p.costo)}</span>
                   </span>
                 </button>
               )
