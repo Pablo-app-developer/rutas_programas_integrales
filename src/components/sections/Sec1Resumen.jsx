@@ -23,6 +23,7 @@ const RutaTick = ({ x, y, payload }) => {
 
 const BulletShape = ({ x, y, width, height, payload, opacity = 1 }) => {
   if (!payload || payload.maxTotal === 0) return null
+  const color = rutaMeta(payload.ruta).color
   const h18 = height * (payload.total18 / payload.maxTotal)
   const h12 = height * (payload.total12 / payload.maxTotal)
   const y18 = y + height - h18
@@ -33,16 +34,16 @@ const BulletShape = ({ x, y, width, height, payload, opacity = 1 }) => {
 
   return (
     <g opacity={opacity}>
-      {/* 18m — fondo ancho semitransparente */}
-      <rect x={x} y={y18} width={width} height={h18} fill={COLOR18} opacity={0.28} rx={3} ry={3} />
+      {/* 18m — fondo ancho semitransparente, mismo color de la ruta */}
+      <rect x={x} y={y18} width={width} height={h18} fill={color} opacity={0.28} />
       {/* 12m — barra delgada al frente */}
-      <rect x={xThin} y={y12} width={thinW} height={h12} fill={COLOR12} rx={2} ry={2} />
+      <rect x={xThin} y={y12} width={thinW} height={h12} fill={color} />
       {/* Etiqueta 18m */}
-      <text x={cx} y={y18 - 11} textAnchor="middle" fontSize={8} fill={COLOR18} fontWeight="700">
+      <text x={cx} y={y18 - 11} textAnchor="middle" fontSize={8} fill={color} fontWeight="700">
         {formatCOP(payload.total18)}
       </text>
       {/* Etiqueta 12m */}
-      <text x={cx} y={y12 - 3} textAnchor="middle" fontSize={8} fill={COLOR12} fontWeight="700">
+      <text x={cx} y={y12 - 3} textAnchor="middle" fontSize={8} fill={color} fontWeight="700">
         {formatCOP(payload.total12)}
       </text>
     </g>
@@ -78,11 +79,11 @@ export default function Sec1Resumen({ data12, data18, selectedRuta, onSelectRuta
       <div className="p-3 flex-1 flex flex-col">
         <div className="flex items-center justify-center gap-5 mb-1">
           <div className="flex items-center gap-1.5">
-            <div style={{ width: 10, height: 14, background: COLOR12, borderRadius: 2 }} />
+            <div style={{ width: 10, height: 14, background: COLORS.textMute }} />
             <span style={{ fontSize: 9, color: COLORS.textMute }}>Ruta Normal (12 meses)</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div style={{ width: 14, height: 14, background: COLOR18, opacity: 0.35, borderRadius: 2 }} />
+            <div style={{ width: 14, height: 14, background: COLORS.textMute, opacity: 0.35 }} />
             <span style={{ fontSize: 9, color: COLORS.textMute }}>Ruta Ecopetrol (18 meses)</span>
           </div>
         </div>
