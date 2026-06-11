@@ -101,7 +101,7 @@ export default function Sec1Resumen({ data12, data18, selectedRuta, onSelectRuta
               <Bar dataKey="maxTotal" shape={<BulletShape />} onClick={d => onSelectRuta(d.ruta)} cursor="pointer" isAnimationActive={false}>
                 {data.map(d => (
                   <Cell key={d.ruta}
-                    opacity={!selectedRuta || selectedRuta === d.ruta ? 1 : 0.4}
+                    opacity={!selectedRuta || selectedRuta === d.ruta ? 1 : 0.12}
                   />
                 ))}
               </Bar>
