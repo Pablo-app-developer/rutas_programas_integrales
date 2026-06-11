@@ -1,7 +1,7 @@
 import { BarChart, Bar, XAxis, YAxis, Cell, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts'
 import SectionHeader from '../ui/SectionHeader.jsx'
 import { totalesPorRuta, formatCOP, formatCOPfull } from '../../utils/parseExcel.js'
-import { rutaMeta, COLORS } from '../../theme.js'
+import { rutaMeta, COLORS, TODAS } from '../../theme.js'
 import { RutaIcon } from '../../icons.jsx'
 
 const COLOR12 = COLORS.navyLight
@@ -102,7 +102,7 @@ export default function Sec1Resumen({ data12, data18, selectedRuta, onSelectRuta
               <Bar dataKey="maxTotal" shape={<BulletShape />} onClick={d => onSelectRuta(d.ruta)} cursor="pointer" isAnimationActive={false}>
                 {data.map(d => (
                   <Cell key={d.ruta}
-                    opacity={!selectedRuta || selectedRuta === d.ruta ? 1 : 0.25}
+                    opacity={!selectedRuta || selectedRuta === TODAS || selectedRuta === d.ruta ? 1 : 0.25}
                   />
                 ))}
               </Bar>
