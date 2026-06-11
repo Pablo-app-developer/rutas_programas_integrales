@@ -39,7 +39,7 @@ export function parseFromArrayBuffer(ab) {
 }
 
 export async function loadDashboardData() {
-  const res = await fetch('./datos.xlsx')
+  const res = await fetch('./SERVICIOS PROGRAMAS INTEGRALES DEPURADO.xlsx')
   const ab = await res.arrayBuffer()
   return parseFromArrayBuffer(ab)
 }
