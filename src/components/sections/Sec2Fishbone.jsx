@@ -99,7 +99,7 @@ export default function Sec2Fishbone({ records, recordsBase, selectedRuta }) {
           )}
         </div>
 
-        <div className="relative flex-1" style={{ minHeight: 250 }}>
+        <div className="relative" style={{ flex: '1 1 0', minHeight: 0 }}>
           {/* SVG: espina + cabeza + costillas (zona central 34–66%) */}
           <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100" style={{ pointerEvents: 'none' }}>
             {/* espina principal */}
