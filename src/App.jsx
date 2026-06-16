@@ -15,10 +15,22 @@ const BASES = {
   '18': { label: 'Ruta Ecopetrol (18 meses)', short: 'Ruta Ecopetrol', meses: '18 meses', color: '#1E8449' },
 }
 
+const TODAS_MOD = '__TODAS_MOD__'
+
+const MOD_LABELS = {
+  'FIJO': 'Fijos', 'Fijo': 'Fijos', 'fijo': 'Fijos',
+  'PROBABILISTICO': 'Probabilísticos', 'Probabilistico': 'Probabilísticos',
+  'probabilistico': 'Probabilísticos', 'PROBABILÍSTICO': 'Probabilísticos',
+}
+function modLabel(v) {
+  return MOD_LABELS[v] || (v.charAt(0).toUpperCase() + v.slice(1).toLowerCase())
+}
+
 export default function App() {
   const { data12, data18, loading, error, reemplazarDatos } = useData()
   const [selectedRuta, setSelectedRuta] = useState('ASMA')
   const [baseActiva, setBaseActiva] = useState('12')
+  const [selectedModalidad, setSelectedModalidad] = useState(TODAS_MOD)
   const [uploadStatus, setUploadStatus] = useState(null) // null | 'loading' | 'ok' | 'error'
   const [showGuia, setShowGuia] = useState(false)
   const fileInputRef = useRef(null)
@@ -63,7 +75,16 @@ export default function App() {
   }
   if (error) return <div className="flex items-center justify-center h-screen text-red-600 text-sm">⚠ {error}</div>
 
-  const records = baseActiva === '12' ? data12 : data18
+  const modalidades = [...new Set([...data12, ...data18].map(r => r.modalidad).filter(Boolean))].sort()
+
+  function filtrarMod(arr) {
+    if (selectedModalidad === TODAS_MOD) return arr
+    return arr.filter(r => r.modalidad === selectedModalidad)
+  }
+
+  const data12Fil = filtrarMod(data12)
+  const data18Fil = filtrarMod(data18)
+  const records = filtrarMod(baseActiva === '12' ? data12 : data18)
   const baseLabel = BASES[baseActiva].label
 
   return (
@@ -96,6 +117,24 @@ export default function App() {
               {RUTAS.map(r => <option key={r} value={r}>{r}</option>)}
             </select>
           </div>
+
+          {/* Selector de modalidad */}
+          {modalidades.length > 0 && (
+            <div className="flex items-center gap-2">
+              <span style={{ fontSize: 11 }} className="text-slate-300">Elegible:</span>
+              <select
+                value={selectedModalidad}
+                onChange={e => setSelectedModalidad(e.target.value)}
+                className="rounded px-2 py-1 font-semibold"
+                style={{ background: '#fff', color: COLORS.navy, fontSize: 12, border: 'none', maxWidth: 160 }}
+              >
+                <option value={TODAS_MOD}>★ Todos</option>
+                {modalidades.map(m => (
+                  <option key={m} value={m}>{modLabel(m)}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Toggle de base 12/18 meses */}
           <div className="flex items-center gap-2">
@@ -270,7 +309,7 @@ export default function App() {
       <main className="p-4" style={{ display: 'grid', gridTemplateColumns: '4fr 5fr 3fr', gap: 16, alignItems: 'stretch' }}>
         {/* Columna izquierda: barras + tabla detallada */}
         <div className="flex flex-col gap-4">
-          <Sec1Resumen data12={data12} data18={data18} selectedRuta={selectedRuta} onSelectRuta={setSelectedRuta} />
+          <Sec1Resumen data12={data12Fil} data18={data18Fil} selectedRuta={selectedRuta} onSelectRuta={setSelectedRuta} />
           <Sec4Tabla records={records} selectedRuta={selectedRuta} />
         </div>
         {/* Columna central (más ancha): fishbone + mapa estratégico (necesitan espacio) */}
@@ -281,7 +320,7 @@ export default function App() {
         {/* Columna derecha (compacta): pareto + comparativo */}
         <div className="flex flex-col gap-4">
           <Sec3Pareto records={records} selectedRuta={selectedRuta} />
-          <Sec5Comparativo data12={data12} data18={data18} selectedRuta={selectedRuta} />
+          <Sec5Comparativo data12={data12Fil} data18={data18Fil} selectedRuta={selectedRuta} />
         </div>
       </main>
 
