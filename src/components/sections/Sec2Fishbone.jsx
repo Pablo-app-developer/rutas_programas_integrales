@@ -123,7 +123,7 @@ export default function Sec2Fishbone({ records, recordsBase, selectedRuta }) {
         </div>
 
         {principal && (
-          <div className="mt-3">
+          <div className="mt-1">
             <Callout icon="bulb">
               El <strong>{formatPct(principal.pct)}</strong> del costo {selectedRuta && selectedRuta !== TODAS ? `de la ruta de ${label}` : 'total'} está explicado por{' '}
               <strong>{catMeta(principal.categoria).label.toLowerCase()}</strong>
