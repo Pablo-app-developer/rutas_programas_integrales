@@ -18,18 +18,22 @@ const BASES = {
 
 const TODAS_MOD = '__TODAS_MOD__'
 
+const TABS = [
+  { key: 'dashboard', label: 'Dashboard' },
+  { key: 'politicas', label: 'Políticas' },
+]
+
 export default function App() {
   const { data12, data18, loading, error, reemplazarDatos } = useData()
   const [selectedRuta, setSelectedRuta] = useState('ASMA')
   const [baseActiva, setBaseActiva] = useState('12')
   const [selectedModalidad, setSelectedModalidad] = useState(TODAS_MOD)
   const [activeTab, setActiveTab] = useState('dashboard')
-  const [uploadStatus, setUploadStatus] = useState(null) // null | 'loading' | 'ok' | 'error'
+  const [uploadStatus, setUploadStatus] = useState(null)
   const [showGuia, setShowGuia] = useState(false)
   const fileInputRef = useRef(null)
   const guiaRef = useRef(null)
 
-  // Cerrar el panel de guía al hacer clic fuera
   useEffect(() => {
     if (!showGuia) return
     const handler = (e) => {
@@ -79,12 +83,14 @@ export default function App() {
   const data18Fil = filtrarMod(data18)
   const recordsBase = baseActiva === '12' ? data12 : data18
   const records = filtrarMod(recordsBase)
-  const baseLabel = BASES[baseActiva].label
 
   return (
     <div style={{ background: COLORS.bg, minHeight: '100vh' }}>
+
       {/* ── Header ── */}
       <header className="flex items-center justify-between px-6 py-3 gap-4 flex-wrap" style={{ background: COLORS.navy }}>
+
+        {/* Logo + título */}
         <div className="flex items-center gap-4">
           <img src="./logo-ino.png" alt="Logo INO" style={{ height: 52, width: 'auto', objectFit: 'contain', flexShrink: 0, filter: 'brightness(0) invert(1)' }} />
           <div>
@@ -97,247 +103,240 @@ export default function App() {
           </div>
         </div>
 
+        {/* Controles derecha */}
         <div className="flex items-center gap-4 flex-wrap">
+
           {/* Pestañas de navegación */}
           <div className="flex rounded-md overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.25)' }}>
-            {[
-              { key: 'dashboard', label: 'Dashboard' },
-              { key: 'politicas', label: 'Políticas' },
-            ].map(tab => {
+            {TABS.map(tab => {
               const on = activeTab === tab.key
               return (
-                <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
                   className="px-3 py-1.5 font-semibold transition-colors"
-                  style={{ background: on ? 'rgba(255,255,255,0.22)' : 'transparent', color: on ? '#fff' : '#94a3b8', fontSize: 11, borderRight: '1px solid rgba(255,255,255,0.15)' }}>
+                  style={{
+                    background: on ? 'rgba(255,255,255,0.22)' : 'transparent',
+                    color: on ? '#fff' : '#cbd5e1',
+                    fontSize: 11,
+                    borderRight: '1px solid rgba(255,255,255,0.15)',
+                  }}
+                >
                   {tab.label}
                 </button>
               )
             })}
           </div>
 
-          {/* Filtros: solo visibles en el dashboard */}
-          {activeTab === 'dashboard' && <><div className="flex items-center gap-2">
-            <span style={{ fontSize: 11 }} className="text-slate-300">Ruta:</span>
-            <select
-              value={selectedRuta}
-              onChange={e => setSelectedRuta(e.target.value)}
-              className="rounded px-2 py-1 font-semibold"
-              style={{ background: '#fff', color: COLORS.navy, fontSize: 12, border: 'none', maxWidth: 200 }}
-            >
-              <option value={TODAS}>★ Todas las Rutas</option>
-              {RUTAS.map(r => <option key={r} value={r}>{r}</option>)}
-            </select>
-          </div>
+          {/* Filtros: solo en dashboard */}
+          {activeTab === 'dashboard' && (
+            <>
+              {/* Selector de ruta */}
+              <div className="flex items-center gap-2">
+                <span style={{ fontSize: 11 }} className="text-slate-300">Ruta:</span>
+                <select
+                  value={selectedRuta}
+                  onChange={e => setSelectedRuta(e.target.value)}
+                  className="rounded px-2 py-1 font-semibold"
+                  style={{ background: '#fff', color: COLORS.navy, fontSize: 12, border: 'none', maxWidth: 200 }}
+                >
+                  <option value={TODAS}>★ Todas las Rutas</option>
+                  {RUTAS.map(r => <option key={r} value={r}>{r}</option>)}
+                </select>
+              </div>
 
-          {/* Selector de modalidad */}
-          {modalidades.length > 0 && (
-            <div className="flex items-center gap-2">
-              <span style={{ fontSize: 11 }} className="text-slate-300">Elegible:</span>
-              <select
-                value={selectedModalidad}
-                onChange={e => setSelectedModalidad(e.target.value)}
-                className="rounded px-2 py-1 font-semibold"
-                style={{ background: '#fff', color: COLORS.navy, fontSize: 12, border: 'none', maxWidth: 160 }}
-              >
-                <option value={TODAS_MOD}>★ Todos</option>
-                {modalidades.map(m => (
-                  <option key={m} value={m}>{modLabel(m)}</option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          {/* Toggle de base 12/18 meses */}
-          <div className="flex items-center gap-2">
-            <span style={{ fontSize: 11 }} className="text-slate-300">Base:</span>
-            <div className="flex rounded-md overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.25)' }}>
-              {Object.entries(BASES).map(([key, b]) => {
-                const on = baseActiva === key
-                return (
-                  <button key={key} onClick={() => setBaseActiva(key)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 font-semibold transition-colors"
-                    style={{ background: on ? b.color : 'transparent', color: on ? '#fff' : '#cbd5e1', fontSize: 11 }}>
-                    <span style={{ width: 11, height: 11, borderRadius: 2, background: on ? '#fff' : b.color, display: 'inline-block' }} />
-                    {b.short}<span style={{ opacity: 0.8 }}>({b.meses})</span>
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-
-          {/* Botón actualizar datos Excel + guía de estructura */}
-          <div className="relative flex items-center gap-1" ref={guiaRef}>
-            <input ref={fileInputRef} type="file" accept=".xlsx" className="hidden" onChange={handleFileUpload} />
-
-            {/* Botón principal */}
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploadStatus === 'loading'}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-l font-semibold transition-all"
-              style={{
-                background: uploadStatus === 'ok' ? '#1E8449'
-                           : uploadStatus === 'error' ? '#C0392B'
-                           : 'rgba(255,255,255,0.15)',
-                color: '#fff', fontSize: 11,
-                border: '1px solid rgba(255,255,255,0.3)', borderRight: 'none',
-                cursor: uploadStatus === 'loading' ? 'wait' : 'pointer',
-              }}
-            >
-              {uploadStatus === 'loading' && <span style={{ fontSize: 12 }}>⟳</span>}
-              {uploadStatus === 'ok' && <span style={{ fontSize: 12 }}>✓</span>}
-              {uploadStatus === 'error' && <span style={{ fontSize: 12 }}>✗</span>}
-              {!uploadStatus && <span style={{ fontSize: 12 }}>↑</span>}
-              {uploadStatus === 'loading' ? 'Cargando…'
-               : uploadStatus === 'ok' ? 'Actualizados'
-               : uploadStatus === 'error' ? 'Error al leer'
-               : 'Actualizar Excel'}
-            </button>
-
-            {/* Botón de ayuda "?" */}
-            <button
-              onClick={() => setShowGuia(v => !v)}
-              className="flex items-center justify-center font-bold rounded-r"
-              style={{
-                width: 26, height: 30,
-                background: showGuia ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.15)',
-                color: '#fff', fontSize: 13,
-                border: '1px solid rgba(255,255,255,0.3)',
-                cursor: 'pointer',
-              }}
-              title="Ver estructura requerida del archivo Excel"
-            >?</button>
-
-            {/* Panel de guía desplegable */}
-            {showGuia && (
-              <div className="absolute right-0 z-50 rounded-lg shadow-2xl"
-                   style={{ top: 'calc(100% + 8px)', width: 360,
-                            background: '#fff', border: `1px solid ${COLORS.border}`,
-                            color: COLORS.textDark }}>
-                {/* Cabecera del panel */}
-                <div className="flex items-center justify-between px-4 py-2 rounded-t-lg"
-                     style={{ background: COLORS.navy }}>
-                  <span className="text-white font-bold uppercase" style={{ fontSize: 11 }}>
-                    Estructura requerida del archivo Excel
-                  </span>
-                  <button onClick={() => setShowGuia(false)}
-                          style={{ color: '#94a3b8', fontSize: 16, lineHeight: 1, background: 'none', border: 'none', cursor: 'pointer' }}>
-                    ✕
-                  </button>
+              {/* Selector de modalidad */}
+              {modalidades.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <span style={{ fontSize: 11 }} className="text-slate-300">Elegible:</span>
+                  <select
+                    value={selectedModalidad}
+                    onChange={e => setSelectedModalidad(e.target.value)}
+                    className="rounded px-2 py-1 font-semibold"
+                    style={{ background: '#fff', color: COLORS.navy, fontSize: 12, border: 'none', maxWidth: 160 }}
+                  >
+                    <option value={TODAS_MOD}>★ Todos</option>
+                    {modalidades.map(m => (
+                      <option key={m} value={m}>{modLabel(m)}</option>
+                    ))}
+                  </select>
                 </div>
+              )}
 
-                <div className="p-4 flex flex-col gap-3" style={{ fontSize: 11 }}>
-                  {/* Formato */}
-                  <div>
-                    <div className="font-bold uppercase mb-1" style={{ color: COLORS.navyLight, fontSize: 10 }}>Formato</div>
-                    <div className="flex items-center gap-2 rounded px-2 py-1.5"
-                         style={{ background: '#F0FDF4', border: '1px solid #86EFAC' }}>
-                      <span style={{ fontSize: 16 }}>📄</span>
-                      <span>Archivo <strong>.xlsx</strong> (Excel 2007 o superior)</span>
-                    </div>
-                  </div>
-
-                  {/* Pestañas requeridas */}
-                  <div>
-                    <div className="font-bold uppercase mb-1" style={{ color: COLORS.navyLight, fontSize: 10 }}>Pestañas (hojas) requeridas</div>
-                    <div className="flex gap-2">
-                      {[
-                        { name: 'BASE12MESES', desc: 'Ruta Normal — 12 meses', color: COLORS.navyLight },
-                        { name: 'BASE18MESES', desc: 'Ruta Ecopetrol — 18 meses', color: '#1E8449' },
-                      ].map(h => (
-                        <div key={h.name} className="flex-1 rounded px-2 py-1.5"
-                             style={{ background: COLORS.calloutBg, border: `1px solid ${COLORS.calloutBorder}22` }}>
-                          <div className="font-bold" style={{ color: h.color, fontSize: 10.5 }}>{h.name}</div>
-                          <div style={{ color: COLORS.textMute, fontSize: 10 }}>{h.desc}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Columnas obligatorias */}
-                  <div>
-                    <div className="font-bold uppercase mb-1" style={{ color: COLORS.navyLight, fontSize: 10 }}>Columnas obligatorias (fila 1 = encabezado)</div>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 10 }}>
-                      <thead>
-                        <tr style={{ background: COLORS.bg }}>
-                          <th className="text-left px-2 py-1" style={{ color: COLORS.textMute, fontWeight: 600 }}>Col</th>
-                          <th className="text-left px-2 py-1" style={{ color: COLORS.textMute, fontWeight: 600 }}>Contenido</th>
-                          <th className="text-left px-2 py-1" style={{ color: COLORS.textMute, fontWeight: 600 }}>12m</th>
-                          <th className="text-left px-2 py-1" style={{ color: COLORS.textMute, fontWeight: 600 }}>18m</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {[
-                          ['A (1)', 'Código del servicio', '—', '—'],
-                          ['B (2)', 'Nombre del servicio', '—', '—'],
-                          ['C (3)', 'Categoría', '—', '—'],
-                          ['AB (28)', 'Costo total por paciente', 'AB', 'AN'],
-                          ['AC (29)', 'Cantidad de servicios', 'AC', 'AO'],
-                          ['AE (31)', 'Valor costo unitario', 'AE', 'AR'],
-                          ['AG (33)', 'Nombre de la ruta', 'AG', 'AS'],
-                        ].map(([col, desc, c12, c18]) => (
-                          <tr key={col} style={{ borderBottom: `1px solid ${COLORS.border}` }}>
-                            <td className="px-2 py-1 font-mono font-bold" style={{ color: COLORS.navy, fontSize: 9.5 }}>{col}</td>
-                            <td className="px-2 py-1" style={{ color: COLORS.textDark }}>{desc}</td>
-                            <td className="px-2 py-1 text-center font-mono" style={{ color: COLORS.navyLight, fontSize: 9 }}>{c12}</td>
-                            <td className="px-2 py-1 text-center font-mono" style={{ color: '#1E8449', fontSize: 9 }}>{c18}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {/* Rutas válidas */}
-                  <div>
-                    <div className="font-bold uppercase mb-1" style={{ color: COLORS.navyLight, fontSize: 10 }}>
-                      Nombres de ruta válidos (columna AG / AS — exactos)
-                    </div>
-                    <div className="flex flex-wrap gap-1">
-                      {RUTAS.map(r => (
-                        <span key={r} className="rounded px-1.5 py-0.5 font-mono"
-                              style={{ background: COLORS.bg, border: `1px solid ${COLORS.border}`, fontSize: 9, color: COLORS.textDark }}>
-                          {r}
-                        </span>
-                      ))}
-                    </div>
-                    <p className="mt-1" style={{ color: COLORS.textMute, fontSize: 9.5 }}>
-                      Los nombres deben coincidir exactamente (mayúsculas incluidas). Filas con ruta no reconocida se ignorarán.
-                    </p>
-                  </div>
-
-                  {/* Tip de uso */}
-                  <div className="rounded px-3 py-2"
-                       style={{ background: '#FFFBEB', border: '1px solid #FCD34D', fontSize: 10 }}>
-                    <strong>Consejo:</strong> El cambio aplica solo a esta sesión del navegador. Para actualizar permanentemente, reemplaza el archivo <code style={{ background: '#FEF3C7', padding: '0 3px', borderRadius: 2 }}>public/datos.xlsx</code> en el repositorio y haz push — Vercel redesplegará automáticamente.
-                  </div>
+              {/* Toggle base 12/18 meses */}
+              <div className="flex items-center gap-2">
+                <span style={{ fontSize: 11 }} className="text-slate-300">Base:</span>
+                <div className="flex rounded-md overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.25)' }}>
+                  {Object.entries(BASES).map(([key, b]) => {
+                    const on = baseActiva === key
+                    return (
+                      <button key={key} onClick={() => setBaseActiva(key)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 font-semibold transition-colors"
+                        style={{ background: on ? b.color : 'transparent', color: on ? '#fff' : '#cbd5e1', fontSize: 11 }}>
+                        <span style={{ width: 11, height: 11, borderRadius: 2, background: on ? '#fff' : b.color, display: 'inline-block' }} />
+                        {b.short}<span style={{ opacity: 0.8 }}>({b.meses})</span>
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
-            )}
-          </div>
-          </>}
+
+              {/* Botón actualizar datos Excel + guía */}
+              <div className="relative flex items-center gap-1" ref={guiaRef}>
+                <input ref={fileInputRef} type="file" accept=".xlsx" className="hidden" onChange={handleFileUpload} />
+
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadStatus === 'loading'}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-l font-semibold transition-all"
+                  style={{
+                    background: uploadStatus === 'ok' ? '#1E8449'
+                               : uploadStatus === 'error' ? '#C0392B'
+                               : 'rgba(255,255,255,0.15)',
+                    color: '#fff', fontSize: 11,
+                    border: '1px solid rgba(255,255,255,0.3)', borderRight: 'none',
+                    cursor: uploadStatus === 'loading' ? 'wait' : 'pointer',
+                  }}
+                >
+                  {uploadStatus === 'loading' && <span style={{ fontSize: 12 }}>⟳</span>}
+                  {uploadStatus === 'ok' && <span style={{ fontSize: 12 }}>✓</span>}
+                  {uploadStatus === 'error' && <span style={{ fontSize: 12 }}>✗</span>}
+                  {!uploadStatus && <span style={{ fontSize: 12 }}>↑</span>}
+                  {uploadStatus === 'loading' ? 'Cargando…'
+                   : uploadStatus === 'ok' ? 'Actualizados'
+                   : uploadStatus === 'error' ? 'Error al leer'
+                   : 'Actualizar Excel'}
+                </button>
+
+                <button
+                  onClick={() => setShowGuia(v => !v)}
+                  className="flex items-center justify-center font-bold rounded-r"
+                  style={{
+                    width: 26, height: 30,
+                    background: showGuia ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.15)',
+                    color: '#fff', fontSize: 13,
+                    border: '1px solid rgba(255,255,255,0.3)',
+                    cursor: 'pointer',
+                  }}
+                  title="Ver estructura requerida del archivo Excel"
+                >?</button>
+
+                {/* Panel de guía desplegable */}
+                {showGuia && (
+                  <div className="absolute right-0 z-50 rounded-lg shadow-2xl"
+                       style={{ top: 'calc(100% + 8px)', width: 360, background: '#fff', border: `1px solid ${COLORS.border}`, color: COLORS.textDark }}>
+                    <div className="flex items-center justify-between px-4 py-2 rounded-t-lg" style={{ background: COLORS.navy }}>
+                      <span className="text-white font-bold uppercase" style={{ fontSize: 11 }}>
+                        Estructura requerida del archivo Excel
+                      </span>
+                      <button onClick={() => setShowGuia(false)}
+                              style={{ color: '#94a3b8', fontSize: 16, lineHeight: 1, background: 'none', border: 'none', cursor: 'pointer' }}>
+                        ✕
+                      </button>
+                    </div>
+                    <div className="p-4 flex flex-col gap-3" style={{ fontSize: 11 }}>
+                      <div>
+                        <div className="font-bold uppercase mb-1" style={{ color: COLORS.navyLight, fontSize: 10 }}>Formato</div>
+                        <div className="flex items-center gap-2 rounded px-2 py-1.5" style={{ background: '#F0FDF4', border: '1px solid #86EFAC' }}>
+                          <span style={{ fontSize: 16 }}>📄</span>
+                          <span>Archivo <strong>.xlsx</strong> (Excel 2007 o superior)</span>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="font-bold uppercase mb-1" style={{ color: COLORS.navyLight, fontSize: 10 }}>Pestañas (hojas) requeridas</div>
+                        <div className="flex gap-2">
+                          {[
+                            { name: 'BASE12MESES', desc: 'Ruta Normal — 12 meses', color: COLORS.navyLight },
+                            { name: 'BASE18MESES', desc: 'Ruta Ecopetrol — 18 meses', color: '#1E8449' },
+                          ].map(h => (
+                            <div key={h.name} className="flex-1 rounded px-2 py-1.5"
+                                 style={{ background: COLORS.calloutBg, border: `1px solid ${COLORS.calloutBorder}22` }}>
+                              <div className="font-bold" style={{ color: h.color, fontSize: 10.5 }}>{h.name}</div>
+                              <div style={{ color: COLORS.textMute, fontSize: 10 }}>{h.desc}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="font-bold uppercase mb-1" style={{ color: COLORS.navyLight, fontSize: 10 }}>Columnas obligatorias (fila 1 = encabezado)</div>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 10 }}>
+                          <thead>
+                            <tr style={{ background: COLORS.bg }}>
+                              <th className="text-left px-2 py-1" style={{ color: COLORS.textMute, fontWeight: 600 }}>Col</th>
+                              <th className="text-left px-2 py-1" style={{ color: COLORS.textMute, fontWeight: 600 }}>Contenido</th>
+                              <th className="text-left px-2 py-1" style={{ color: COLORS.textMute, fontWeight: 600 }}>12m</th>
+                              <th className="text-left px-2 py-1" style={{ color: COLORS.textMute, fontWeight: 600 }}>18m</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {[
+                              ['A (1)', 'Código del servicio', '—', '—'],
+                              ['B (2)', 'Nombre del servicio', '—', '—'],
+                              ['C (3)', 'Categoría', '—', '—'],
+                              ['AB (28)', 'Costo total por paciente', 'AB', 'AN'],
+                              ['AC (29)', 'Cantidad de servicios', 'AC', 'AO'],
+                              ['AE (31)', 'Valor costo unitario', 'AE', 'AR'],
+                              ['AG (33)', 'Nombre de la ruta', 'AG', 'AS'],
+                            ].map(([col, desc, c12, c18]) => (
+                              <tr key={col} style={{ borderBottom: `1px solid ${COLORS.border}` }}>
+                                <td className="px-2 py-1 font-mono font-bold" style={{ color: COLORS.navy, fontSize: 9.5 }}>{col}</td>
+                                <td className="px-2 py-1" style={{ color: COLORS.textDark }}>{desc}</td>
+                                <td className="px-2 py-1 text-center font-mono" style={{ color: COLORS.navyLight, fontSize: 9 }}>{c12}</td>
+                                <td className="px-2 py-1 text-center font-mono" style={{ color: '#1E8449', fontSize: 9 }}>{c18}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <div className="font-bold uppercase mb-1" style={{ color: COLORS.navyLight, fontSize: 10 }}>
+                          Nombres de ruta válidos (columna AG / AS — exactos)
+                        </div>
+                        <div className="flex flex-wrap gap-1">
+                          {RUTAS.map(r => (
+                            <span key={r} className="rounded px-1.5 py-0.5 font-mono"
+                                  style={{ background: COLORS.bg, border: `1px solid ${COLORS.border}`, fontSize: 9, color: COLORS.textDark }}>
+                              {r}
+                            </span>
+                          ))}
+                        </div>
+                        <p className="mt-1" style={{ color: COLORS.textMute, fontSize: 9.5 }}>
+                          Los nombres deben coincidir exactamente (mayúsculas incluidas). Filas con ruta no reconocida se ignorarán.
+                        </p>
+                      </div>
+                      <div className="rounded px-3 py-2" style={{ background: '#FFFBEB', border: '1px solid #FCD34D', fontSize: 10 }}>
+                        <strong>Consejo:</strong> El cambio aplica solo a esta sesión del navegador. Para actualizar permanentemente, reemplaza el archivo{' '}
+                        <code style={{ background: '#FEF3C7', padding: '0 3px', borderRadius: 2 }}>public/datos.xlsx</code> en el repositorio y haz push.
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
         </div>
       </header>
 
-      {/* ── Pestaña Políticas ── */}
+      {/* ── Contenido según pestaña activa ── */}
       {activeTab === 'politicas' && <Sec7Politicas />}
 
-      {/* ── 3 columnas de anchos distintos (cada sección con el espacio que necesita) ── */}
-      {activeTab === 'dashboard' && <main className="p-4" style={{ display: 'grid', gridTemplateColumns: '4fr 5fr 3fr', gap: 16, alignItems: 'stretch' }}>
-        {/* Columna izquierda: barras + tabla detallada */}
-        <div className="flex flex-col gap-4">
-          <Sec1Resumen data12={data12Fil} data18={data18Fil} selectedRuta={selectedRuta} onSelectRuta={setSelectedRuta} />
-          <Sec4Tabla records={records} selectedRuta={selectedRuta} />
-        </div>
-        {/* Columna central (más ancha): fishbone + mapa estratégico (necesitan espacio) */}
-        <div className="flex flex-col gap-4">
-          <Sec2Fishbone records={records} recordsBase={recordsBase} selectedRuta={selectedRuta} />
-          <Sec6Mapa records={records} selectedRuta={selectedRuta} onSelectRuta={setSelectedRuta} />
-        </div>
-        {/* Columna derecha (compacta): pareto + comparativo */}
-        <div className="flex flex-col gap-4">
-          <Sec3Pareto records={records} selectedRuta={selectedRuta} />
-          <Sec5Comparativo data12={data12Fil} data18={data18Fil} selectedRuta={selectedRuta} />
-        </div>
-      </main>}
+      {activeTab === 'dashboard' && (
+        <main className="p-4" style={{ display: 'grid', gridTemplateColumns: '4fr 5fr 3fr', gap: 16, alignItems: 'stretch' }}>
+          <div className="flex flex-col gap-4">
+            <Sec1Resumen data12={data12Fil} data18={data18Fil} selectedRuta={selectedRuta} onSelectRuta={setSelectedRuta} />
+            <Sec4Tabla records={records} selectedRuta={selectedRuta} />
+          </div>
+          <div className="flex flex-col gap-4">
+            <Sec2Fishbone records={records} recordsBase={recordsBase} selectedRuta={selectedRuta} />
+            <Sec6Mapa records={records} selectedRuta={selectedRuta} onSelectRuta={setSelectedRuta} />
+          </div>
+          <div className="flex flex-col gap-4">
+            <Sec3Pareto records={records} selectedRuta={selectedRuta} />
+            <Sec5Comparativo data12={data12Fil} data18={data18Fil} selectedRuta={selectedRuta} />
+          </div>
+        </main>
+      )}
 
       {/* ── Footer ── */}
       <footer className="px-6 py-3 flex items-center justify-between gap-4 flex-wrap" style={{ background: COLORS.navy }}>
@@ -349,6 +348,7 @@ export default function App() {
           Fuente: Costos por Programa y Uso de Recursos Médicos
         </p>
       </footer>
+
     </div>
   )
 }
