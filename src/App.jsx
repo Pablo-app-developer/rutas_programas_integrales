@@ -88,12 +88,12 @@ export default function App() {
     <div style={{ background: COLORS.bg, minHeight: '100vh' }}>
 
       {/* ── Header ── */}
-      <header className="flex items-center justify-between px-6 py-3 gap-4 flex-wrap" style={{ background: COLORS.navy }}>
+      <header className="flex items-center px-6 py-3 gap-4" style={{ background: COLORS.navy }}>
 
-        {/* Logo + título */}
-        <div className="flex items-center gap-4">
+        {/* Logo + título — izquierda */}
+        <div className="flex items-center gap-4 flex-1 min-w-0">
           <img src="./logo-ino.png" alt="Logo INO" style={{ height: 52, width: 'auto', objectFit: 'contain', flexShrink: 0, filter: 'brightness(0) invert(1)' }} />
-          <div>
+          <div className="min-w-0">
             <h1 className="text-white font-bold uppercase leading-tight" style={{ fontSize: 22, letterSpacing: '0.01em' }}>
               Estructura del Costo por Programa y Uso de Recursos Médicos
             </h1>
@@ -103,32 +103,30 @@ export default function App() {
           </div>
         </div>
 
-        {/* Controles derecha */}
-        <div className="flex items-center gap-4 flex-wrap">
+        {/* Pestañas — centro fijo */}
+        <div className="flex rounded-md overflow-hidden flex-shrink-0" style={{ border: '1px solid rgba(255,255,255,0.25)' }}>
+          {TABS.map(tab => {
+            const on = activeTab === tab.key
+            return (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className="px-3 py-1.5 font-semibold transition-colors"
+                style={{
+                  background: on ? 'rgba(255,255,255,0.22)' : 'transparent',
+                  color: on ? '#fff' : '#cbd5e1',
+                  fontSize: 11,
+                  borderRight: '1px solid rgba(255,255,255,0.15)',
+                }}
+              >
+                {tab.label}
+              </button>
+            )
+          })}
+        </div>
 
-          {/* Pestañas de navegación */}
-          <div className="flex rounded-md overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.25)' }}>
-            {TABS.map(tab => {
-              const on = activeTab === tab.key
-              return (
-                <button
-                  key={tab.key}
-                  onClick={() => setActiveTab(tab.key)}
-                  className="px-3 py-1.5 font-semibold transition-colors"
-                  style={{
-                    background: on ? 'rgba(255,255,255,0.22)' : 'transparent',
-                    color: on ? '#fff' : '#cbd5e1',
-                    fontSize: 11,
-                    borderRight: '1px solid rgba(255,255,255,0.15)',
-                  }}
-                >
-                  {tab.label}
-                </button>
-              )
-            })}
-          </div>
-
-          {/* Filtros: solo en dashboard */}
+        {/* Filtros — derecha (solo en dashboard, ocupa flex-1 para empujar desde la derecha) */}
+        <div className="flex items-center gap-4 flex-wrap flex-1 justify-end">
           {activeTab === 'dashboard' && (
             <>
               {/* Selector de ruta */}
@@ -314,8 +312,8 @@ export default function App() {
               </div>
             </>
           )}
-
         </div>
+
       </header>
 
       {/* ── Contenido según pestaña activa ── */}
