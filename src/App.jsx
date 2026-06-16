@@ -8,6 +8,7 @@ import Sec3Pareto from './components/sections/Sec3Pareto.jsx'
 import Sec4Tabla from './components/sections/Sec4Tabla.jsx'
 import Sec5Comparativo from './components/sections/Sec5Comparativo.jsx'
 import Sec6Mapa from './components/sections/Sec6Mapa.jsx'
+import Sec7Politicas from './components/sections/Sec7Politicas.jsx'
 import { LayoutGrid } from './icons.jsx'
 
 const BASES = {
@@ -22,6 +23,7 @@ export default function App() {
   const [selectedRuta, setSelectedRuta] = useState('ASMA')
   const [baseActiva, setBaseActiva] = useState('12')
   const [selectedModalidad, setSelectedModalidad] = useState(TODAS_MOD)
+  const [activeTab, setActiveTab] = useState('dashboard')
   const [uploadStatus, setUploadStatus] = useState(null) // null | 'loading' | 'ok' | 'error'
   const [showGuia, setShowGuia] = useState(false)
   const fileInputRef = useRef(null)
@@ -96,8 +98,25 @@ export default function App() {
         </div>
 
         <div className="flex items-center gap-4 flex-wrap">
-          {/* Selector de ruta */}
-          <div className="flex items-center gap-2">
+          {/* Pestañas de navegación */}
+          <div className="flex rounded-md overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.25)' }}>
+            {[
+              { key: 'dashboard', label: 'Dashboard' },
+              { key: 'politicas', label: 'Políticas' },
+            ].map(tab => {
+              const on = activeTab === tab.key
+              return (
+                <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+                  className="px-3 py-1.5 font-semibold transition-colors"
+                  style={{ background: on ? 'rgba(255,255,255,0.22)' : 'transparent', color: on ? '#fff' : '#94a3b8', fontSize: 11, borderRight: '1px solid rgba(255,255,255,0.15)' }}>
+                  {tab.label}
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Filtros: solo visibles en el dashboard */}
+          {activeTab === 'dashboard' && <><div className="flex items-center gap-2">
             <span style={{ fontSize: 11 }} className="text-slate-300">Ruta:</span>
             <select
               value={selectedRuta}
@@ -294,11 +313,15 @@ export default function App() {
               </div>
             )}
           </div>
+          </>}
         </div>
       </header>
 
+      {/* ── Pestaña Políticas ── */}
+      {activeTab === 'politicas' && <Sec7Politicas />}
+
       {/* ── 3 columnas de anchos distintos (cada sección con el espacio que necesita) ── */}
-      <main className="p-4" style={{ display: 'grid', gridTemplateColumns: '4fr 5fr 3fr', gap: 16, alignItems: 'stretch' }}>
+      {activeTab === 'dashboard' && <main className="p-4" style={{ display: 'grid', gridTemplateColumns: '4fr 5fr 3fr', gap: 16, alignItems: 'stretch' }}>
         {/* Columna izquierda: barras + tabla detallada */}
         <div className="flex flex-col gap-4">
           <Sec1Resumen data12={data12Fil} data18={data18Fil} selectedRuta={selectedRuta} onSelectRuta={setSelectedRuta} />
@@ -314,7 +337,7 @@ export default function App() {
           <Sec3Pareto records={records} selectedRuta={selectedRuta} />
           <Sec5Comparativo data12={data12Fil} data18={data18Fil} selectedRuta={selectedRuta} />
         </div>
-      </main>
+      </main>}
 
       {/* ── Footer ── */}
       <footer className="px-6 py-3 flex items-center justify-between gap-4 flex-wrap" style={{ background: COLORS.navy }}>
