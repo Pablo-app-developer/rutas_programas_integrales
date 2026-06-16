@@ -62,6 +62,15 @@ export const RUTAS = [
   'EPOC', 'DISNEA - OBESIDAD', 'TRASTORNOS DE SUEÑO', 'EJERCICIO FISICO', 'CUIDADO RESPIRATORIO',
 ]
 
+const MOD_LABELS = {
+  'FIJO': 'Fijos', 'Fijo': 'Fijos', 'fijo': 'Fijos',
+  'PROBABILISTICO': 'Probabilísticos', 'Probabilistico': 'Probabilísticos',
+  'probabilistico': 'Probabilísticos', 'PROBABILÍSTICO': 'Probabilísticos',
+}
+export function modLabel(v) {
+  return MOD_LABELS[v] || (v.charAt(0).toUpperCase() + v.slice(1).toLowerCase())
+}
+
 // Nivel de impacto económico por cuartil de costo → color del mapa estratégico
 export const IMPACTO = {
   muyAlto: { color: '#E03A3A', label: 'Muy Alto' },

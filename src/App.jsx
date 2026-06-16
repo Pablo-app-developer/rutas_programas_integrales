@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useData } from './hooks/useData.js'
 import { parseFromArrayBuffer } from './utils/parseExcel.js'
-import { RUTAS, TODAS, COLORS } from './theme.js'
+import { RUTAS, TODAS, COLORS, modLabel } from './theme.js'
 import Sec1Resumen from './components/sections/Sec1Resumen.jsx'
 import Sec2Fishbone from './components/sections/Sec2Fishbone.jsx'
 import Sec3Pareto from './components/sections/Sec3Pareto.jsx'
@@ -16,15 +16,6 @@ const BASES = {
 }
 
 const TODAS_MOD = '__TODAS_MOD__'
-
-const MOD_LABELS = {
-  'FIJO': 'Fijos', 'Fijo': 'Fijos', 'fijo': 'Fijos',
-  'PROBABILISTICO': 'Probabilísticos', 'Probabilistico': 'Probabilísticos',
-  'probabilistico': 'Probabilísticos', 'PROBABILÍSTICO': 'Probabilísticos',
-}
-function modLabel(v) {
-  return MOD_LABELS[v] || (v.charAt(0).toUpperCase() + v.slice(1).toLowerCase())
-}
 
 export default function App() {
   const { data12, data18, loading, error, reemplazarDatos } = useData()
@@ -84,7 +75,8 @@ export default function App() {
 
   const data12Fil = filtrarMod(data12)
   const data18Fil = filtrarMod(data18)
-  const records = filtrarMod(baseActiva === '12' ? data12 : data18)
+  const recordsBase = baseActiva === '12' ? data12 : data18
+  const records = filtrarMod(recordsBase)
   const baseLabel = BASES[baseActiva].label
 
   return (
@@ -314,7 +306,7 @@ export default function App() {
         </div>
         {/* Columna central (más ancha): fishbone + mapa estratégico (necesitan espacio) */}
         <div className="flex flex-col gap-4">
-          <Sec2Fishbone records={records} selectedRuta={selectedRuta} />
+          <Sec2Fishbone records={records} recordsBase={recordsBase} selectedRuta={selectedRuta} />
           <Sec6Mapa records={records} selectedRuta={selectedRuta} onSelectRuta={setSelectedRuta} />
         </div>
         {/* Columna derecha (compacta): pareto + comparativo */}

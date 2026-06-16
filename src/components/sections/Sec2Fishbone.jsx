@@ -1,7 +1,7 @@
 import SectionHeader from '../ui/SectionHeader.jsx'
 import Callout from '../ui/Callout.jsx'
 import { categoriasDeRuta, totalRuta, formatCOPfull, formatPct } from '../../utils/parseExcel.js'
-import { catMeta, rutaLabel, TODAS, COLORS } from '../../theme.js'
+import { catMeta, rutaLabel, modLabel, TODAS, COLORS } from '../../theme.js'
 import { CatIcon } from '../../icons.jsx'
 
 function shortServicio(s) {
@@ -20,9 +20,20 @@ const BOT_ANCHOR = 67       // donde nacen las costillas inferiores
 const RIB_LEAN = 7          // inclinación de la costilla hacia la cabeza
 const X_START = 9, X_SPAN = 73, HEAD_X = 86
 
-export default function Sec2Fishbone({ records, selectedRuta }) {
+export default function Sec2Fishbone({ records, recordsBase, selectedRuta }) {
   const cats = categoriasDeRuta(records, selectedRuta).slice(0, 5)
   const total = totalRuta(records, selectedRuta)
+
+  // Totales fijo / probabilístico desde los records sin filtro de modalidad
+  const recsRuta = (recordsBase || []).filter(r =>
+    !selectedRuta || selectedRuta === TODAS || r.ruta === selectedRuta
+  )
+  const modTotales = {}
+  for (const r of recsRuta) {
+    if (!r.modalidad) continue
+    modTotales[r.modalidad] = (modTotales[r.modalidad] || 0) + r.valorCosto
+  }
+  const modalidades = Object.entries(modTotales).sort((a, b) => b[1] - a[1])
   const top = cats.filter((_, i) => i % 2 === 0)
   const bottom = cats.filter((_, i) => i % 2 === 1)
   // Cada fila se reparte de forma independiente en todo el ancho útil.
@@ -72,6 +83,20 @@ export default function Sec2Fishbone({ records, selectedRuta }) {
             Costo Total {label}
           </div>
           <div className="font-bold" style={{ color: COLORS.navy, fontSize: 24 }}>{formatCOPfull(total)}</div>
+          {modalidades.length > 0 && (
+            <div className="flex items-center justify-center gap-4 mt-1 flex-wrap">
+              {modalidades.map(([mod, val]) => (
+                <div key={mod} className="flex items-center gap-1.5">
+                  <span className="rounded-full" style={{
+                    width: 7, height: 7, display: 'inline-block', flexShrink: 0,
+                    background: mod.toLowerCase().includes('fijo') ? COLORS.navyLight : '#E67E22',
+                  }} />
+                  <span style={{ fontSize: 10, color: COLORS.textMute }}>{modLabel(mod)}:</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: COLORS.textDark }}>{formatCOPfull(val)}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="relative flex-1" style={{ minHeight: 250 }}>
