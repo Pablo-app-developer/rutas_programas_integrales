@@ -23,6 +23,7 @@ export const CATEGORIAS = {
   'Diagnosticos': { color: '#1E8449', icon: '🔬', label: 'DIAGNÓSTICOS' },
   'Educacion': { color: '#138086', icon: '📚', label: 'EDUCACIÓN' },
   'Gestion y seguimiento': { color: '#7D3C98', icon: '📋', label: 'GESTIÓN Y SEGUIMIENTO' },
+  'Medicamentos': { color: '#C0392B', icon: '💊', label: 'MEDICAMENTOS' },
 }
 
 export function catMeta(cat) {

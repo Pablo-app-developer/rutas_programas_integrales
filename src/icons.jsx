@@ -2,7 +2,7 @@
 import {
   CigaretteOff, HeartPulse, Wind, Moon, Dumbbell, Scale,
   Target, Layers, AirVent,
-  Stethoscope, Microscope, Activity, GraduationCap, ClipboardList,
+  Stethoscope, Microscope, Activity, GraduationCap, ClipboardList, Pill,
   DollarSign, ListChecks, CalendarDays, Star, Lightbulb,
   TrendingUp, TrendingDown, LayoutGrid, Minus,
 } from 'lucide-react'
@@ -46,6 +46,7 @@ const CAT_ICONS = {
   'Terapias': Activity,
   'Educacion': GraduationCap,
   'Gestion y seguimiento': ClipboardList,
+  'Medicamentos': Pill,
 }
 
 export function CatIcon({ cat, size = 16, color = 'currentColor', strokeWidth = 2 }) {

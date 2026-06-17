@@ -21,7 +21,7 @@ const RIB_LEAN = 7          // inclinación de la costilla hacia la cabeza
 const X_START = 9, X_SPAN = 73, HEAD_X = 86
 
 export default function Sec2Fishbone({ records, recordsBase, selectedRuta }) {
-  const cats = categoriasDeRuta(records, selectedRuta).slice(0, 5)
+  const cats = categoriasDeRuta(records, selectedRuta).slice(0, 6)
   const total = totalRuta(records, selectedRuta)
 
   // Totales fijo / probabilístico desde los records sin filtro de modalidad
